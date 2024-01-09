@@ -33,8 +33,8 @@ export const ContainerCenterText = styled.div`
 `
 export const ContainerImgLogo = styled.div`
     position: absolute;
-    top: 0;
-    right: 0;
+    top: 8px;
+    right: 8px;
 `
 
 export const ContainerInput = styled.div`
