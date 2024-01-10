@@ -6,9 +6,9 @@ chrome.contextMenus.create({
 
 chrome.contextMenus.onClicked.addListener((info) => {
     if (info.menuItemId === "summary") {
-        chrome.tabs.query({ active: true, currentWindow: true }, async (tabs: any) => {
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs: any) => {
             if (tabs && tabs[0]) {
-                await chrome.tabs.sendMessage(tabs[0].id, { text: info.selectionText }, async (response) => {
+                chrome.tabs.sendMessage(tabs[0].id, { text: info.selectionText }, (response) => {
                     console.log(response);
                 });
             }
