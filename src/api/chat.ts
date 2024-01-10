@@ -5,8 +5,9 @@ const azureApiKey = apiKey;
 
 const azureClient = new OpenAIClient(azureEndpoint, new AzureKeyCredential(azureApiKey));
 
-export const getResponseAzureChat = async (prompt: string, model: string): Promise<string> => {
-    const azurePrompt: any = [{ role: 'system', content: "You are assistant, your name is Bugsy" }, { role: 'user', content: prompt }];
+export const getResponseAzureChat = async (prompt: string, model: string, fineTuring?: string): Promise<string> => {
+    const azurePrompt: any =
+        [{ role: 'system', content: fineTuring ? fineTuring : "You are assistant, your name is Bugsy" }, { role: 'user', content: prompt }];
     if (!prompt) {
         return "Please enter a prompt.";
     }
