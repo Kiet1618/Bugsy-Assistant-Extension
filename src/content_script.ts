@@ -1,12 +1,13 @@
 import { GPT35TURBO16K } from './api/configs';
 import { apiKey } from "./api/configs";
 //content_script.ts
+import Markdown from 'react-markdown'
 
 
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     (async () => {
-        const apiUrl = "https://sunhackathon5.openai.azure.com/openai/deployments/GPT35TURBO/chat/completions?api-version=2023-12-01-preview";
+        const apiUrl = "https://sunhackathon5.openai.azure.com/openai/deployments/GPT35TURBO16K/chat/completions?api-version=2023-12-01-preview";
         const azurePrompt = {
             messages: [
                 { role: 'system', content: "Summary of content" },
@@ -44,25 +45,25 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             dialog.style.backgroundColor = 'white';
             dialog.style.zIndex = '9999';
             dialog.style.fontSize = '16px';
-            dialog.style.borderRadius = '5px';
-            dialog.style.padding = '20px';
+            dialog.style.borderRadius = '10px';
+            dialog.style.padding = '40px 30px';
             dialog.style.boxSizing = 'border-box';
             dialog.style.border = '1px solid #ccc';
             dialog.style.paddingTop = '50px';
             dialog.style.overflowY = 'auto';
 
             const title = document.createElement('div');
-            title.style.position = 'absolute';
+            title.style.position = 'fixed';
             title.innerHTML = 'Bugsy Summary';
             title.style.textAlign = 'center';
-            title.style.top = '0';
+            title.style.top = '5px';
             title.style.fontSize = '20px';
             title.style.fontWeight = 'bold';
-            title.style.padding = '10px';
+            title.style.padding = '10px 0px';
             title.style.textAlign = 'center';
 
             const close = document.createElement('button');
-            close.style.position = 'absolute';
+            close.style.position = 'fixed';
             close.style.top = '10px';
             close.style.right = '10px';
             close.style.border = 'none';

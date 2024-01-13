@@ -48,7 +48,6 @@ export const ContainerChatHistory = styled.div`
     padding: 0 10px;
     box-sizing: border-box;
     height: 330px;
-    margin-bottom: 30px;
     overflow: auto;
 
 `
@@ -79,6 +78,7 @@ export const BoxChatResponse = styled.div`
     border: 1px solid #ccc;
     border-radius: 5px;
     margin: 10px 0;
+    overflow-x: auto;
     background-color: rgba(255, 0, 255, 0.05) 
 `
 
@@ -98,4 +98,12 @@ export const ButtonFooter = styled.button`
     &:hover {
         text-decoration: underline;
     }
+`
+
+export const ContainerListIcon = styled.div`
+    display: flex;
+    justify-content: right;
+    padding: 2px 10px;
+    width: 100%;
+    box-sizing: border-box;
 `

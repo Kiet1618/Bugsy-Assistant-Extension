@@ -6,10 +6,11 @@ import {
   ContainerChatHistory, BoxChatRequest,
   BoxChatResponse, ContainerChat,
   ContainerImgLogo, ContainerFooter,
-  ButtonFooter
+  ButtonFooter, ContainerListIcon
 } from "./styles";
 
 import { GPT35TURBO, GPT35TURBO16K, ADA } from './api/configs';
+import Markdown from 'react-markdown'
 
 import { getResponseAzureChat } from "./api/chat";
 import { getHistory } from "./storage/localstorage";
@@ -19,9 +20,14 @@ type Chat = {
   response: string;
 };
 
+interface AppState {
+  screenCapture: string;
+  open: boolean;
+  title: string;
+}
+
 const Popup = () => {
-  const [chat, setChat] = useState<Array<Chat>>([
-  ]);
+  const [chat, setChat] = useState<Array<Chat>>([]);
 
   const [input, setInput] = useState<string>("");
   const chatHistoryRef = useRef<HTMLDivElement>(null);
@@ -49,6 +55,9 @@ const Popup = () => {
     }
   }, []);
 
+  // Capture Image
+
+
 
   return (
     <Style>
@@ -62,10 +71,18 @@ const Popup = () => {
         {chat.map((item, index) => (
           <ContainerChat key={index}>
             {item.request ? <BoxChatRequest>{item.request}</BoxChatRequest> : null}
-            {item.response ? <BoxChatResponse>{item.response}</BoxChatResponse> : null}
+            {item.response ? <BoxChatResponse> <Markdown>{item.response}</Markdown></BoxChatResponse> : null}
           </ContainerChat>
         ))}
       </ContainerChatHistory>
+      <ContainerListIcon >
+        <ButtonFooter>
+          <img width={"20px"} src="https://i.ibb.co/gF8ChFt/add-image.png"></img>
+        </ButtonFooter>
+        <ButtonFooter>
+          <img width={"20px"} src="https://i.ibb.co/jvrrFBp/file-pdf.png"></img>
+        </ButtonFooter>
+      </ContainerListIcon>
       <ContainerInput>
         <Input
           placeholder="Type something..."
