@@ -23,12 +23,12 @@ export const getHistory = () => {
 };
 
 
-export const getPdf = () => {
+export const getSpeak = () => {
     try {
         if (typeof win !== "undefined") {
-            const data = win.localStorage.getItem("pdf");
+            const data = win.localStorage.getItem("speak");
             if (typeof data === "string") {
-                return data;
+                return JSON.parse(data);
             }
         }
         return null;

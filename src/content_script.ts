@@ -47,6 +47,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             dialog.style.fontSize = '16px';
             dialog.style.borderRadius = '10px';
             dialog.style.padding = '40px 30px';
+            dialog.style.color = '#000';
             dialog.style.boxSizing = 'border-box';
             dialog.style.border = '1px solid #ccc';
             dialog.style.paddingTop = '50px';
@@ -54,13 +55,26 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
             const title = document.createElement('div');
             title.style.position = 'fixed';
-            title.innerHTML = 'Bugsy Summary';
+            title.innerHTML = 'Summary';
             title.style.textAlign = 'center';
             title.style.top = '5px';
+            title.style.color = '#638889';
             title.style.fontSize = '20px';
             title.style.fontWeight = 'bold';
             title.style.padding = '10px 0px';
             title.style.textAlign = 'center';
+            title.style.marginLeft = '30px'
+
+            const logo = document.createElement('img');
+            logo.src = "https://i.ibb.co/6RKxZK9/download-logo.png"
+            logo.style.width = '60px';
+            logo.style.position = 'absolute';
+            logo.style.top = '5px';
+            logo.style.left = '10px';
+            // inner
+            dialog.appendChild(logo);
+
+
 
             const close = document.createElement('button');
             close.style.position = 'fixed';

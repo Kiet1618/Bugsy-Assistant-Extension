@@ -6,25 +6,20 @@ import {
   ContainerChatHistory, BoxChatRequest,
   BoxChatResponse, ContainerChat,
   ContainerImgLogo, ContainerFooter,
-  ButtonFooter, ContainerListIcon
+  ButtonFooter, ContainerImgSpeak
 } from "./styles";
 
 import { GPT35TURBO, GPT35TURBO16K, ADA } from './api/configs';
 import Markdown from 'react-markdown'
-
 import { getResponseAzureChat } from "./api/chat";
-import { getHistory, getPdf } from "./storage/localstorage";
+import { getHistory, getSpeak } from "./storage/localstorage";
+import 'regenerator-runtime/runtime'
+import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition'
 
 type Chat = {
   request: string;
   response: string;
 };
-
-interface AppState {
-  screenCapture: string;
-  open: boolean;
-  title: string;
-}
 
 const Popup = () => {
   const [chat, setChat] = useState<Array<Chat>>([]);
@@ -36,37 +31,6 @@ const Popup = () => {
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInput(e.target.value);
   };
-
-
-
-  // loading pdf
-  const [pdfFile, setPdfFile] = useState<string>('');
-
-  const fileType = ['application/pdf'];
-  const [pdfFileError, setPdfFileError] = useState('');
-
-  const handlePdfFileChange = (e: any) => {
-    let selectedFile = e.target.files[0];
-    if (selectedFile) {
-      if (selectedFile && fileType.includes(selectedFile.type)) {
-        let reader = new FileReader();
-        reader.readAsDataURL(selectedFile);
-        reader.onloadend = (e) => {
-          localStorage.setItem("pdf", e.target?.result ? e.target.result as string : '');
-          setPdfFile(e.target?.result ? e.target.result as string : '');
-          setPdfFileError('');
-        }
-      }
-      else {
-        setPdfFile('');
-        setPdfFileError('Please select valid pdf file');
-        localStorage.removeItem("pdf");
-      }
-    }
-    else {
-      console.log('select your file');
-    }
-  }
 
   //use Effect
   useEffect(() => {
@@ -86,20 +50,135 @@ const Popup = () => {
       console.log(err);
     }
 
+    try {
+      const data = getSpeak()
+      if (data) {
+        setSpeech(data);
+      }
+    }
+    catch (err) {
+      console.log(err);
+    }
   }, []);
+
+
+  // text to speech
+  const [voicelist, setVoicelist] = useState([]);
+  const [currLang, setCurrLang] = useState(null);
+
+  useEffect(() => {
+    const synth = window.speechSynthesis;
+
+    const updateVoicelist = () => {
+      const voices: any = synth.getVoices();
+      setVoicelist(voices);
+    };
+
+    synth.onvoiceschanged = updateVoicelist;
+
+    return () => {
+      synth.onvoiceschanged = null;
+    };
+  }, []);
+
+  const speakfnc = (text: string) => {
+    const regex = /<[^>]*>/g;
+    const cleanText = text.replace(regex, '');
+
+    // Set the maximum chunk size based on your requirements
+    const maxChunkSize = 200;
+
+    // Break down the text into chunks
+    const chunks = [];
+    for (let i = 0; i < cleanText.length; i += maxChunkSize) {
+      chunks.push(cleanText.slice(i, i + maxChunkSize));
+    }
+
+    // Speak each chunk separately
+    chunks.forEach(chunk => {
+      const speakText = new SpeechSynthesisUtterance(chunk);
+      speakText.voice = currLang;
+      window.speechSynthesis.speak(speakText);
+    });
+  };
+
+  const stopSpeaking = () => {
+    window.speechSynthesis.cancel();
+  }
+
+
+  const [speech, setSpeech] = useState<Boolean>(false);
+
+  // Speech Recognition
+
+  const [loadingRecognition, setLoadingRecognition] = useState(false);
+
+
+  const {
+    transcript,
+    listening,
+    resetTranscript,
+    browserSupportsSpeechRecognition
+  } = useSpeechRecognition();
+
+  if (!browserSupportsSpeechRecognition) {
+    return <span>Browser doesn't support speech recognition.</span>;
+  }
+
+  const handleRecognitionStart = () => {
+    setLoadingRecognition(true);
+    SpeechRecognition.startListening;
+
+  }
+  const handleRecognitionStop = () => {
+    setLoadingRecognition(false);
+    SpeechRecognition.stopListening;
+    setChat([...chat, { request: transcript, response: "Loading..." }]);
+    setInput("");
+    if (transcript) {
+      getResponseAzureChat(transcript, model)
+        .then((response: string) => {
+          setChat([...chat, { request: transcript, response: response }]);
+          localStorage.setItem("chat", JSON.stringify([...chat, { request: transcript, response: response }]));
+          if (speech) {
+            speakfnc(response)
+          }
+        });
+    }
+    else {
+      setChat([...chat, { request: "", response: "I didn't hear you say anything, could you please say that again?" }]);
+      if (speech) {
+        speakfnc("I didn't hear you say anything, could you please say that again?")
+      }
+    }
+  }
+
 
   return (
     <Style>
       <ContainerCenterText>
         <ContainerImgLogo>
-          <img width={"60px"} src="https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/e8ddc4da-23dd-4502-b65b-378c9cfe5efa/dffvl73-294f6e5b-aad2-484f-bde8-1ecf082f1dfe.png/v1/fill/w_1280,h_1280/bug_type_symbol_galar_by_jormxdos_dffvl73-fullview.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MTI4MCIsInBhdGgiOiJcL2ZcL2U4ZGRjNGRhLTIzZGQtNDUwMi1iNjViLTM3OGM5Y2ZlNWVmYVwvZGZmdmw3My0yOTRmNmU1Yi1hYWQyLTQ4NGYtYmRlOC0xZWNmMDgyZjFkZmUucG5nIiwid2lkdGgiOiI8PTEyODAifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.msN6ZkYf5XuPiA27qO-1Zaow3B4iSRqp3nAHzctfBW0" alt="Bugsy" />
+          <img width={"100px"} src="https://i.ibb.co/6RKxZK9/download-logo.png" alt="Bugsy" />
         </ContainerImgLogo>
-        <img width={"180px"} src="https://i.ibb.co/HH8F7dy/textLogo.png" alt="Bugsy" />
+        <img width={"150px"} src="https://i.ibb.co/SBxCPSF/cooltext450696555749941.png" alt="Bugsy" />
       </ContainerCenterText>
+      <ContainerImgSpeak>
+        <ButtonFooter onClick={
+          () => {
+            setSpeech(!speech);
+            stopSpeaking();
+            localStorage.setItem("speak", JSON.stringify(!speech));
+          }
+        }>
+          {speech ?
+            <img width={"20px"} src="https://i.ibb.co/y4HMRC2/icons8-mute-50.png"></img> :
+            <img width={"20px"} src="https://i.ibb.co/CVt4F2P/icons8-mute-50-1.png"></img>}
+        </ButtonFooter>
+      </ContainerImgSpeak>
       <ContainerChatHistory ref={chatHistoryRef}>
         {chat.map((item, index) => (
           <ContainerChat key={index}>
-            {item.request ? <BoxChatRequest>{item.request}</BoxChatRequest> : null}
+            {item.request ? <BoxChatRequest>  <Markdown>{item.request}</Markdown></BoxChatRequest> : null}
             {item.response ? <BoxChatResponse> <Markdown>{item.response}</Markdown></BoxChatResponse> : null}
           </ContainerChat>
         ))}
@@ -114,16 +193,32 @@ const Popup = () => {
               setChat([...chat, { request: input, response: "Loading..." }]);
               setInput("");
               getResponseAzureChat(input, model)
-                .then((response) => {
+                .then((response: string) => {
                   setChat([...chat, { request: input, response: response }]);
                   localStorage.setItem("chat", JSON.stringify([...chat, { request: input, response: response }]));
+                  if (speech) {
+                    speakfnc(response)
+                  }
                 });
             }
           }}
         />
+        {!loadingRecognition ?
+          <ButtonFooter onClick={handleRecognitionStart}>
+            <img width={"20px"} src="https://i.ibb.co/N9HvgCk/icons8-mic-50.png"></img>
+
+          </ButtonFooter> :
+          <ButtonFooter onClick={handleRecognitionStop}
+          >
+            <img width={"20px"} src="https://i.ibb.co/MRm34F1/icons8-stop-50.png"></img>
+
+          </ButtonFooter>
+        }
+
       </ContainerInput>
 
       <ContainerFooter>
+
         <ButtonFooter onClick={
           () => {
             if (model === GPT35TURBO) {
@@ -133,6 +228,9 @@ const Popup = () => {
             }
           }
         }>{model === GPT35TURBO ? GPT35TURBO : GPT35TURBO16K}</ButtonFooter>
+
+
+
         <ButtonFooter onClick={
           () => {
             localStorage.removeItem("chat");

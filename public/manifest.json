@@ -28,7 +28,9 @@
     "activeTab",
     "contextMenus",
     "tabs",
-    "webRequest"
+    "webRequest",
+    "audioCapture",
+    "microphone"
   ],
   "host_permissions": [
     "<all_urls>"

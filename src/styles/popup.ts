@@ -11,7 +11,7 @@ export const Style = styled.div`
     -moz-osx-font-smoothing: grayscale;
     font-size: 16px;
     position: relative;
-    background: linear-gradient(to bottom right,  rgba(255, 0, 255, 0.1), rgba(0, 255, 0, 0.1));
+    // background: linear-gradient(to bottom right, rgb(249, 239, 219, 0.2), rgb(99, 136, 137, 0.2));
     padding: 10px;
 }
 `
@@ -19,7 +19,7 @@ export const Style = styled.div`
 export const Input = styled.input`
     width: 100%;
     height: 40px;
-    border: 1px solid #ccc;
+    border: 1px solid #63888950;
     border-radius: 5px;
     padding: 0 10px;
     margin-bottom: 10px;
@@ -33,7 +33,13 @@ export const ContainerCenterText = styled.div`
 `
 export const ContainerImgLogo = styled.div`
     position: absolute;
-    top: 8px;
+    top: 0px;
+    left: 8px;
+`
+
+export const ContainerImgSpeak = styled.div`
+    position: absolute;
+    top: 18px;
     right: 8px;
 `
 
@@ -41,6 +47,8 @@ export const ContainerInput = styled.div`
     width: 100%;
     padding: 0 10px;
     box-sizing: border-box;
+    display: flex;
+    justify-content: center;
 `
 
 export const ContainerChatHistory = styled.div`
@@ -54,32 +62,35 @@ export const ContainerChatHistory = styled.div`
 
 export const ContainerChat = styled.div`
     width: 100%;
-    box-sizing: border-box;
-
+    box-sizing: border-box;    
 `
 
 export const BoxChatRequest = styled.div`
-    width: 100%;
+    width: max-content;
     height: 100%;
-    padding: 10px;
+    padding: 0px 10px;
     box-sizing: border-box;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    border: 1px solid #638889;
+    border-radius: 10px;
     margin: 10px 0;
     text-align: right;
-    background-color: rgba(0, 255, 0, 0.05)
+    // background-color: rgba(0, 255, 0, 0.05)
+    color: #fff;
+    margin-left: auto; 
+    background-color: rgb(99, 136, 137)
 `
 
 export const BoxChatResponse = styled.div`
-    width: 100%;
+    width: max-content;
+    max-width: 100%;
     height: 100%;
-    padding: 10px;
+    padding: 0 10px;
     box-sizing: border-box;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    border: 1px solid #63888950;
+    border-radius: 10px;
     margin: 10px 0;
     overflow-x: auto;
-    background-color: rgba(255, 0, 255, 0.05) 
+    background-color: rgb(249, 239, 219, 0.2)
 `
 
 export const ContainerFooter = styled.div`
