@@ -13,7 +13,7 @@ import { GPT35TURBO, GPT35TURBO16K, ADA } from './api/configs';
 import Markdown from 'react-markdown'
 
 import { getResponseAzureChat } from "./api/chat";
-import { getHistory } from "./storage/localstorage";
+import { getHistory, getPdf } from "./storage/localstorage";
 
 type Chat = {
   request: string;
@@ -37,6 +37,38 @@ const Popup = () => {
     setInput(e.target.value);
   };
 
+
+
+  // loading pdf
+  const [pdfFile, setPdfFile] = useState<string>('');
+
+  const fileType = ['application/pdf'];
+  const [pdfFileError, setPdfFileError] = useState('');
+
+  const handlePdfFileChange = (e: any) => {
+    let selectedFile = e.target.files[0];
+    if (selectedFile) {
+      if (selectedFile && fileType.includes(selectedFile.type)) {
+        let reader = new FileReader();
+        reader.readAsDataURL(selectedFile);
+        reader.onloadend = (e) => {
+          localStorage.setItem("pdf", e.target?.result ? e.target.result as string : '');
+          setPdfFile(e.target?.result ? e.target.result as string : '');
+          setPdfFileError('');
+        }
+      }
+      else {
+        setPdfFile('');
+        setPdfFileError('Please select valid pdf file');
+        localStorage.removeItem("pdf");
+      }
+    }
+    else {
+      console.log('select your file');
+    }
+  }
+
+  //use Effect
   useEffect(() => {
     if (chatHistoryRef.current) {
       chatHistoryRef.current.scrollTop = chatHistoryRef.current.scrollHeight;
@@ -53,11 +85,8 @@ const Popup = () => {
     catch (err) {
       console.log(err);
     }
+
   }, []);
-
-  // Capture Image
-
-
 
   return (
     <Style>
@@ -75,14 +104,6 @@ const Popup = () => {
           </ContainerChat>
         ))}
       </ContainerChatHistory>
-      <ContainerListIcon >
-        <ButtonFooter>
-          <img width={"20px"} src="https://i.ibb.co/gF8ChFt/add-image.png"></img>
-        </ButtonFooter>
-        <ButtonFooter>
-          <img width={"20px"} src="https://i.ibb.co/jvrrFBp/file-pdf.png"></img>
-        </ButtonFooter>
-      </ContainerListIcon>
       <ContainerInput>
         <Input
           placeholder="Type something..."
@@ -111,7 +132,7 @@ const Popup = () => {
               setModel(GPT35TURBO)
             }
           }
-        }>Use {model === GPT35TURBO ? GPT35TURBO16K : GPT35TURBO}</ButtonFooter>
+        }>{model === GPT35TURBO ? GPT35TURBO : GPT35TURBO16K}</ButtonFooter>
         <ButtonFooter onClick={
           () => {
             localStorage.removeItem("chat");

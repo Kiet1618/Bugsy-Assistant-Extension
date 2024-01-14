@@ -47,7 +47,7 @@ export const ContainerChatHistory = styled.div`
     width: 100%;
     padding: 0 10px;
     box-sizing: border-box;
-    height: 330px;
+    height: 370px;
     overflow: auto;
 
 `
@@ -102,8 +102,8 @@ export const ButtonFooter = styled.button`
 
 export const ContainerListIcon = styled.div`
     display: flex;
-    justify-content: right;
-    padding: 2px 10px;
+    justify-content: left;
+    padding: 5px 10px;
     width: 100%;
     box-sizing: border-box;
 `

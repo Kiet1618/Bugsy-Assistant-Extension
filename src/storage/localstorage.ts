@@ -21,3 +21,18 @@ export const getHistory = () => {
         return null;
     }
 };
+
+
+export const getPdf = () => {
+    try {
+        if (typeof win !== "undefined") {
+            const data = win.localStorage.getItem("pdf");
+            if (typeof data === "string") {
+                return data;
+            }
+        }
+        return null;
+    } catch {
+        return null;
+    }
+}
